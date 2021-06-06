@@ -12,12 +12,14 @@ about="""
 
     """
 
+import time
 from tkinter import *
 import vlc 
 from os import path
 from threading import Thread
 import glob 
 import random 
+from time import sleep
 
 #FLAG para cerrar hilos y parar procesos
 ACTIVE=TRUE
@@ -88,7 +90,7 @@ def highscore():
     B_close.place(x=0,y=0)
 
 def level1():    
-    global ACTIVE 
+    ACTIVE=True 
     Space_p.withdraw()
     
     levelone = Toplevel()
@@ -99,36 +101,24 @@ def level1():
     C_level1 = Canvas(levelone,bg='White',width=800,height=800)
     C_level1.place(x=0,y=0)
 
-    ##########Cargar 'Frames' del 'Sprite'#######################
-    def load_sprite(patron):
-        frames = glob.glob('assests\\ship_player\\' + patron)
-        frames.sort()
-        return load_Simage(frames,[])
-
-    def load_Simage(input,list_result):
-        if(input == []):
-            return list_result
-        else:
-            list_result.append(PhotoImage(file=input[0]))
-            return load_Simage(input[1:],list_result)
-    #############################################
+    
     images= load_sprite('tile*.png')
     ship = C_level1.create_image(350,700, tags='ship')
     
     
-
-    def recursive_animation(i):
-        nonlocal images
-        global ACTIVE
-        if(ACTIVE==True):
-            if(i==2):
-                i=0
+    if(ACTIVE==True):
+        print(ACTIVE)
+        def recursive_animation(i):
+            nonlocal images
+            global ACTIVE
             if(ACTIVE==True):
-                C_level1.itemconfig('ship',image=images[i])
-                def callback():
-                    recursive_animation(i+1)
-                levelone.after(100,callback)
-    Thread(target=recursive_animation,args=(0,)).start()    
+                if(i==3):
+                    i=0
+                if(ACTIVE==True):
+                    C_level1.itemconfig('ship',image=images[i])
+                    time.sleep(0.1)
+                    Thread(target=recursive_animation,args=(i+1,)).start()
+        Thread(target=recursive_animation,args=(0,)).start()    
 
 
 
@@ -163,7 +153,7 @@ def level1():
         ACTIVE=False 
         stop_sound()
         Space_p.deiconify()
-        levelone.withdraw()
+        levelone.destroy()
     #####Botones########
     B_closelevels = Button(levelone,bg='Red',text='Back and Close',font='Terminal',command=closelevel1)
     B_closelevels.place(x=0,y=0)
@@ -244,8 +234,20 @@ def img_load(name):
     direction= path.join('assests',name)
     img= PhotoImage(file=direction)
     return img 
-############################################
+##w##########################################
+##########Cargar 'Frames' del 'Sprite'#######################
+def load_sprite(patron):
+    frames = glob.glob('assests\\ship_player\\' + patron)
+    frames.sort()
+    return load_Simage(frames,[])
 
+def load_Simage(input,list_result):
+    if(input == []):
+        return list_result
+    else:
+        list_result.append(PhotoImage(file=input[0]))
+        return load_Simage(input[1:],list_result)
+    #############################################
 ##Reproductor de sonido###VLC################
 sound_player = vlc.MediaPlayer()
 def sound_load(name): #Ruta del .MP3
