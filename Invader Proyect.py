@@ -99,43 +99,58 @@ def level1():
     C_level1 = Canvas(levelone,bg='White',width=800,height=800)
     C_level1.place(x=0,y=0)
 
+    ##########Cargar 'Frames' del 'Sprite'#######################
+    def load_sprite(patron):
+        frames = glob.glob('assests\\ship_player\\' + patron)
+        frames.sort()
+        return load_Simage(frames,[])
 
-
-    ship = C_level1.create_image(350,700, tags='ship')
+    def load_Simage(input,list_result):
+        if(input == []):
+            return list_result
+        else:
+            list_result.append(PhotoImage(file=input[0]))
+            return load_Simage(input[1:],list_result)
+    #############################################
     images= load_sprite('tile*.png')
+    ship = C_level1.create_image(350,700, tags='ship')
     
-    if(ACTIVE):
-        def recursive_animation(i):
-            nonlocal images
-            global ACTIVE
-            if(ACTIVE):
-                if(i==0):
-                    i=0;
-                if(ACTIVE):
-                    C_level1.itemconfig('ship',image=images[i])
-                    def callback():
-                        recursive_animation(i+1)
-                    levelone.after(100,callback)
-        Thread(target=recursive_animation,args=(0,)).start()    
-        def move_ship(event):
-            if event.keysym =='Up':
-                if C_level1.coords(ship)[1]>0:
-                    C_level1.move(ship,0,-15)
-            elif event.keysym =='Down':
-                if C_level1.coords(ship)[1]<780:
-                    C_level1.move(ship,0,15)
-            elif event.keysym =='Left':
-                if C_level1.coords(ship)[0]>30:
-                    C_level1.move(ship,-15,0)
-            elif event.keysym =='Right':
-                if C_level1.coords(ship)[0]<780:
-                     C_level1.move(ship,15,0)
+    
 
-        C_level1.bind_all('<KeyPress-Up>',move_ship)
-        C_level1.bind_all('<KeyPress-Down>',move_ship)
-        C_level1.bind_all('<KeyPress-Left>',move_ship)
-        C_level1.bind_all('<KeyPress-Right>',move_ship)
-        #C_level1.bind_all('<KeyRelease-space>',fire)
+    def recursive_animation(i):
+        nonlocal images
+        global ACTIVE
+        if(ACTIVE==True):
+            if(i==2):
+                i=0
+            if(ACTIVE==True):
+                C_level1.itemconfig('ship',image=images[i])
+                def callback():
+                    recursive_animation(i+1)
+                levelone.after(100,callback)
+    Thread(target=recursive_animation,args=(0,)).start()    
+
+
+
+    def move_ship(event):
+        if event.keysym =='Up':
+            if C_level1.coords(ship)[1]>0:
+                C_level1.move(ship,0,-15)
+        elif event.keysym =='Down':
+            if C_level1.coords(ship)[1]<780:
+                C_level1.move(ship,0,15)
+        elif event.keysym =='Left':
+            if C_level1.coords(ship)[0]>30:
+                C_level1.move(ship,-15,0)
+        elif event.keysym =='Right':
+            if C_level1.coords(ship)[0]<780:
+                C_level1.move(ship,15,0)
+
+    C_level1.bind_all('<KeyPress-Up>',move_ship)
+    C_level1.bind_all('<KeyPress-Down>',move_ship)
+    C_level1.bind_all('<KeyPress-Left>',move_ship)
+    C_level1.bind_all('<KeyPress-Right>',move_ship)
+    #C_level1.bind_all('<KeyRelease-space>',fire)
         
     
 
@@ -230,18 +245,7 @@ def img_load(name):
     img= PhotoImage(file=direction)
     return img 
 ############################################
-##########Cargar 'Frames' del 'Sprite'#######################
-def load_sprite(patron):
-    frames = glob.glob('assets\\ship_player\\' + patron)
-    frames.sort()
-    return load_Simage(frames,[])
-def load_Simage(inputx,list_result):
-    if(inputx==[]):
-        return list_result
-    else:
-        list_result.append(PhotoImage(file=inputx[0]))
-        return load_Simage(inputx[1:],list_result)
-#############################################
+
 ##Reproductor de sonido###VLC################
 sound_player = vlc.MediaPlayer()
 def sound_load(name): #Ruta del .MP3
