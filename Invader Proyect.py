@@ -15,9 +15,9 @@ about="""
 from tkinter import *
 import vlc 
 from os import path
-#from time import Thread
+from threading import Thread
 import glob 
-#import random 
+import random 
 
 #FLAG para cerrar hilos y parar procesos
 ACTIVE=TRUE
@@ -99,10 +99,24 @@ def level1():
     C_level1 = Canvas(levelone,bg='White',width=800,height=800)
     C_level1.place(x=0,y=0)
 
-    C_level1.ship = img_load('ship_player\\tile001.png')
-    ship = C_level1.create_image(350,750, anchor=NW, image=C_level1.ship)
+
+
+    ship = C_level1.create_image(350,700, tags='ship')
+    images= load_sprite('tile*.png')
     
     if(ACTIVE):
+        def recursive_animation(i):
+            nonlocal images
+            global ACTIVE
+            if(ACTIVE):
+                if(i==0):
+                    i=0;
+                if(ACTIVE):
+                    C_level1.itemconfig('ship',image=images[i])
+                    def callback():
+                        recursive_animation(i+1)
+                    levelone.after(100,callback)
+        Thread(target=recursive_animation,args=(0,)).start()    
         def move_ship(event):
             if event.keysym =='Up':
                 if C_level1.coords(ship)[1]>0:
@@ -116,14 +130,16 @@ def level1():
             elif event.keysym =='Right':
                 if C_level1.coords(ship)[0]<780:
                      C_level1.move(ship,15,0)
-        
-
 
         C_level1.bind_all('<KeyPress-Up>',move_ship)
         C_level1.bind_all('<KeyPress-Down>',move_ship)
         C_level1.bind_all('<KeyPress-Left>',move_ship)
         C_level1.bind_all('<KeyPress-Right>',move_ship)
         #C_level1.bind_all('<KeyRelease-space>',fire)
+        
+    
+
+       
     
 
     #####CERRAR VENTANA##############
@@ -214,6 +230,17 @@ def img_load(name):
     img= PhotoImage(file=direction)
     return img 
 ############################################
+##########Cargar 'Frames' del 'Sprite'#######################
+def load_sprite(patron):
+    frames = glob.glob('assets\\ship_player\\' + patron)
+    frames.sort()
+    return load_Simage(frames,[])
+def load_Simage(inputx,list_result):
+    if(inputx==[]):
+        return list_result
+    else:
+        list_result.append(PhotoImage(file=inputx[0]))
+        return load_Simage(inputx[1:],list_result)
 #############################################
 ##Reproductor de sonido###VLC################
 sound_player = vlc.MediaPlayer()
