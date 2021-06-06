@@ -6,14 +6,12 @@ about="""
     Profesor Milton Villegas Lemus
     Versión del programa 1.0
     Autores: Angelo Fabian Ceciliano Ortega, Sebastian Chaves Ruiz
-    Autores de algunos módulos utilizados: José Fernando Morales
-    
-    
-
+    Autores de algunos módulos utilizados: José Fernando Morales    
     """
 
 import time
 from tkinter import *
+from typing import get_origin
 import vlc 
 from os import path
 from threading import Thread
@@ -29,15 +27,30 @@ Space_p = Tk()
 Space_p.title('SPACE INVADER')
 Space_p.minsize(800,800)
 Space_p.resizable(width=NO, height=NO)
-
- 
+##Reproductor de sonido###VLC################
+sound_player = vlc.MediaPlayer()
+def sound_load(name): #Ruta del .MP3
+    return path.join('assets\\music',name)
+def player_music(MP3): # Reproductor de Musica
+    global sound_player
+    stop_sound()
+    sound_player = vlc.MediaPlayer(MP3)
+    sound_player.audio_set_volume(40)
+    sound_player.play()
+def player_fx(MP3): #Reproductor de efectos 
+    vlc.MediaPlayer(MP3).play()
+def stop_sound(): #Para sonidos, aunque se usa para parar la musica, los efectos se paran solos. 
+    global sound_player
+    if(isinstance(sound_player,vlc.MediaPlayer)):
+        sound_player.stop()
+################################
+def img_load(name):
+    direction= path.join('assests',name)
+    img= PhotoImage(file=direction)
+    return img  
   
 #Ventana de seleccion de niveles
-
-     
-
-    
-
+ 
 def credits():
     global ACTIVE,Space_p
     Space_p.withdraw()
@@ -89,7 +102,8 @@ def highscore():
     B_close=Button(score,bg='Red',text='Back',command=close_score)
     B_close.place(x=0,y=0)
 
-def level1():    
+def level1():
+    global ACTIVE    
     ACTIVE=True 
     Space_p.withdraw()
     
@@ -101,51 +115,100 @@ def level1():
     C_level1 = Canvas(levelone,bg='White',width=800,height=800)
     C_level1.place(x=0,y=0)
 
-    
+    def load_sprite(patron):
+        frames = glob.glob('assests\\ship_player\\' + patron)
+        frames.sort()
+        return load_Simage(frames,[])
+
+    def load_Simage(input,list_result):
+        if(input == []):
+            return list_result
+        else:
+            list_result.append(PhotoImage(file=input[0]))
+        return load_Simage(input[1:],list_result)
+
     images= load_sprite('tile*.png')
     ship = C_level1.create_image(350,700, tags='ship')
     
-    
-    if(ACTIVE==True):
-        print(ACTIVE)
-        def recursive_animation(i):
-            nonlocal images
-            global ACTIVE
-            if(ACTIVE==True):
-                if(i==3):
-                    i=0
-                if(ACTIVE==True):
-                    C_level1.itemconfig('ship',image=images[i])
-                    time.sleep(0.1)
-                    Thread(target=recursive_animation,args=(i+1,)).start()
-        Thread(target=recursive_animation,args=(0,)).start()    
-
-
+    def recursive_animation(i):
+        nonlocal images
+        if(i==3):
+            i=0
+        if(ACTIVE==True):
+            C_level1.itemconfig('ship',image=images[i])
+            time.sleep(0.1)
+            Thread(target=recursive_animation,args=(i+1,)).start()
+    Thread(target=recursive_animation,args=(0,)).start()    
 
     def move_ship(event):
         if event.keysym =='Up':
             if C_level1.coords(ship)[1]>0:
-                C_level1.move(ship,0,-15)
+                C_level1.move(ship,0,-13)
         elif event.keysym =='Down':
             if C_level1.coords(ship)[1]<780:
-                C_level1.move(ship,0,15)
+                C_level1.move(ship,0,13)
         elif event.keysym =='Left':
             if C_level1.coords(ship)[0]>30:
-                C_level1.move(ship,-15,0)
+                C_level1.move(ship,-13,0)
         elif event.keysym =='Right':
             if C_level1.coords(ship)[0]<780:
-                C_level1.move(ship,15,0)
+                C_level1.move(ship,13,0)
 
     C_level1.bind_all('<KeyPress-Up>',move_ship)
     C_level1.bind_all('<KeyPress-Down>',move_ship)
     C_level1.bind_all('<KeyPress-Left>',move_ship)
     C_level1.bind_all('<KeyPress-Right>',move_ship)
     #C_level1.bind_all('<KeyRelease-space>',fire)
-        
-    
 
+
+
+"""
+    Bullet = cargar_img2('Bullet2.png')
+
+    Flag2=True
+    def temporizador2():
+        nonlocal Flag2
+        if Flag2 == True:
+            time.sleep(1)
+            DisparoJefe()
+            temporizador2()
+    Thread(target = temporizador2).start() 
+
+    def MovimientoD(Bala):
+        global Boss_life, reproducir_fx, Score, Nave_life, FlagA
+        Bala_box= Canv_Pantalla2.bbox(Bala)
+        Aliadobox= Canv_Pantalla2.bbox(Aliado_Canv)
+        if FlagA==True:
+            if Canv_Pantalla2.coords(Bala)[1]>700: #Limite hasta donde llega la bala
+                Canv_Pantalla2.delete(Bala)
+            elif Aliadobox[0]<Bala_box[2] and Aliadobox[2]>Bala_box[0] and Aliadobox[1]<Bala_box[3]<Aliadobox[3] and Aliadobox[3] > Aliadobox[1]:
+                Canv_Pantalla2.delete(Bala)
+                if Nave_life!=0:
+                    Nave_life-=3
+                    Nave_life_l2.config(text="❤:" + str(Nave_life))
+                if Nave_life==2:
+                    Nave_life-=2
+                    Nave_life_l2.config(text="❤:" + str(Nave_life))
+            else:
+                Canv_Pantalla2.move(Bala,0,3) #El disparo avanza en el eje Y
+                Canv_Pantalla2.after(15,MovimientoD,Bala)
+
+    def DisparoJefe():
+        global FlagA
+        if FlagA==True:
+            coords= Canv_Pantalla2.coords(Jefe2_E)
+            Bala1 = Canv_Pantalla2.create_image(coords[0]+80,coords[1]-55,anchor=NW,image=Bullet)
+            Bala2 = Canv_Pantalla2.create_image(coords[0]-100,coords[1]-55,anchor=NW,image=Bullet)
+            Bala3 = Canv_Pantalla2.create_image(coords[0]-35,coords[1]+50,anchor=NW,image=Bullet)
+            reproducir_fx(cargarMP3('SE_01.wav'))
+            Thread(target=MovimientoD, args=(Bala1,)).start()
+            Thread(target=MovimientoD, args=(Bala2,)).start()
+            Thread(target=MovimientoD, args=(Bala3,)).start()
+        
        
-    
+
+
+
 
     #####CERRAR VENTANA##############
     def closelevel1():
@@ -159,56 +222,10 @@ def level1():
     B_closelevels.place(x=0,y=0)
     levelone.protocol('WM_DELETE_WINDOW',closelevel1)
 
-def level2():
-    Space_p.withdraw()
-    leveltwo = Toplevel()
-    leveltwo.title('2 level')
-    leveltwo.minsize(800,800)
-    leveltwo.resizable(width=NO,height=NO)
 
 
 
-
-
-
-    #####CERRAR VENTANA##############
-    def closelevel2():
-        global ACTIVE
-        ACTIVE=False 
-        stop_sound()
-        Space_p.deiconify()
-        leveltwo.withdraw()
-    #####Botones########
-    B_closelevels = Button(leveltwo,bg='Red',text='Back and Close',font='Terminal',command=closelevel2)
-    B_closelevels.place(x=0,y=0)
-    leveltwo.protocol('WM_DELETE_WINDOW',closelevel2)
-
-
-
-def level3():
-    Space_p.withdraw()
-    levelthree = Toplevel()
-    levelthree.title('3 level')
-    levelthree.minsize(800,800)
-    levelthree.resizable(width=NO,height=NO)
-
-
-
-
-
-
-
-    #####CERRAR VENTANA##############
-    def closelevel3():
-        global ACTIVE
-        ACTIVE=False 
-        stop_sound()
-        Space_p.deiconify()
-        levelthree.withdraw()
-    #####Botones########
-    B_closelevels = Button(levelthree,bg='Red',text='Back and Close',font='Terminal',command=closelevel3)
-    B_closelevels.place(x=0,y=0)
-    levelthree.protocol('WM_DELETE_WINDOW',closelevel3)
+"""
 
 
 
@@ -227,44 +244,6 @@ def level3():
 
 
 
-#Funciones de apoyo
-#Cargar imagenes con path
-#cargar audio con vlc
-def img_load(name):
-    direction= path.join('assests',name)
-    img= PhotoImage(file=direction)
-    return img 
-##w##########################################
-##########Cargar 'Frames' del 'Sprite'#######################
-def load_sprite(patron):
-    frames = glob.glob('assests\\ship_player\\' + patron)
-    frames.sort()
-    return load_Simage(frames,[])
-
-def load_Simage(input,list_result):
-    if(input == []):
-        return list_result
-    else:
-        list_result.append(PhotoImage(file=input[0]))
-        return load_Simage(input[1:],list_result)
-    #############################################
-##Reproductor de sonido###VLC################
-sound_player = vlc.MediaPlayer()
-def sound_load(name): #Ruta del .MP3
-    return path.join('assets\\music',name)
-def player_music(MP3): # Reproductor de Musica
-    global sound_player
-    stop_sound()
-    sound_player = vlc.MediaPlayer(MP3)
-    sound_player.audio_set_volume(40)
-    sound_player.play()
-def player_fx(MP3): #Reproductor de efectos 
-    vlc.MediaPlayer(MP3).play()
-def stop_sound(): #Para sonidos, aunque se usa para parar la musica, los efectos se paran solos. 
-    global sound_player
-    if(isinstance(sound_player,vlc.MediaPlayer)):
-        sound_player.stop()
-################################
 #Funcion para cerrar el programa
 def close():
     global Space_p
@@ -300,9 +279,9 @@ B_closegame.place(x=770,y=0)
 
 B_level1= Button(Space_p,bg='#41036e',text='Level 1',font='Terminal',command=level1) 
 B_level1.place(x=350,y=400)
-B_level2= Button(Space_p,bg='#41036e',text='Level 2',font='Terminal',command=level2)
+B_level2= Button(Space_p,bg='#41036e',text='Level 2',font='Terminal',command="level2")
 B_level2.place(x=350,y=450)
-B_level3= Button(Space_p,bg='#41036e',text='Level 3',font='Terminal',command=level3)
+B_level3= Button(Space_p,bg='#41036e',text='Level 3',font='Terminal',command="level3")
 B_level3.place(x=350,y=500)
 
 
