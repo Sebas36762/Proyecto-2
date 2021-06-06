@@ -11,7 +11,7 @@ about="""
     
 
     """
-#caca 
+
 from tkinter import *
 import vlc 
 from os import path
