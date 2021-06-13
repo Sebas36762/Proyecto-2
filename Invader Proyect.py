@@ -9,12 +9,13 @@ about="""
     Autores de algunos módulos utilizados: José Fernando Morales    
     """
 
+from ctypes import create_unicode_buffer
 import time
 from tkinter import *
 from typing import get_origin
 import vlc 
 from os import path
-from threading import Thread
+from threading import Thread, ThreadError
 import glob 
 import random 
 from time import sleep
@@ -164,6 +165,72 @@ def level1():
 
 
 
+
+    C_level1.rock0 = img_load('rock.png')
+    C_level1.rock1 = img_load('rock.png')
+    
+
+    
+    
+  
+    """
+    def move_rockx(Rock):
+        Cor_rock= C_level1.coords(Rock)
+        if(ACTIVE):
+            if Cor_rock[0]>=700:
+                C_level1.move(Rock,-5,0)
+                C_level1.after(15,move_rockx,-5)
+            elif Cor_rock[0]<2:
+                C_level1.move(Rock,5,0)
+                C_level1.after(15,move_rockx,5)   
+            else:
+                C_level1.move(Rock,Rock,0)
+                C_level1.after(15,move_rockx,Rock)
+    Thread(target=move_rockx,args=(5,)).start()
+    
+    def move_rocky(Rock):
+         Cor_rock= C_level1.coords(rock00)
+         if(ACTIVE):
+            if Cor_rock[1]>780:
+                C_level1.move(rock00,0,-5)  
+                C_level1.after(15,move_rocky,-5)
+            elif Cor_rock[1]<0:
+                C_level1.move(rock00,0,5)
+                C_level1.after(15,move_rocky,5)
+            else:
+                C_level1.move(rock00,0,Rock)
+                C_level1.after(15,move_rocky,Rock)
+    Thread(target=move_rocky,args=(5,)).start()
+    """
+    def selector():
+        if(ACTIVE):
+            sleep(0.5)
+            rocks_s()
+            sleep(0,7)
+            selector()
+    Thread(target=selector).start()
+
+
+    def move_rock(rock):
+        coords_rock= C_level1.coords(rock)
+        if(ACTIVE):
+            if coords_rock[0]>830 or coords_rock[0]<-15 or coords_rock[1]>830 or coords_rock[1]<-15:
+                C_level1.delete(rock)
+        
+        else:
+            C_level1.move(rock,5,5)
+            C_level1.after(10,move_rock,rock)
+    
+    def rocks_s():
+        if(ACTIVE):
+            coords = C_level1.coords(0,0)
+            rock1 = C_level1.create_image(x=0,y=800, anchor=NW, image=C_level1.rock0) 
+            rock2 = C_level1.create_image(x=0,y=0,anchor=NW,image=C_level1.rock1)
+            Thread(target=move_rock,args=(rock1,)).start()
+            Thread(target=move_rock,args=(rock2,)).start()
+            
+    
+    
     """
     Bullet = cargar_img2('Bullet2.png')
 
@@ -237,6 +304,7 @@ def level1():
 
 
 
+
 #Funcion para cerrar el programa
 def close():
     global Space_p
@@ -272,10 +340,10 @@ B_closegame.place(x=770,y=0)
 
 B_level1= Button(Space_p,bg='#41036e',text='Level 1',font='Terminal',command=level1) 
 B_level1.place(x=350,y=400)
-B_level2= Button(Space_p,bg='#41036e',text='Level 2',font='Terminal',command=level2)
-B_level2.place(x=350,y=450)
-B_level3= Button(Space_p,bg='#41036e',text='Level 3',font='Terminal',command=level3)
-B_level3.place(x=350,y=500)
+#B_level2= Button(Space_p,bg='#41036e',text='Level 2',font='Terminal',command=#level2)
+#B_level2.place(x=350,y=450)
+#B_level3= Button(Space_p,bg='#41036e',text='Level 3',font='Terminal',command=#level3)
+#B_level3.place(x=350,y=500)
 
 
 Space_p.protocol('WM_DELETE_WINDOW',close)
