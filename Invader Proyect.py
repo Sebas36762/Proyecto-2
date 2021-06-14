@@ -1,7 +1,7 @@
 about="""
 
     País de producción Costa Rica
-    Tecnológico de Costa Rica, ingeniería en Computadores
+    Tecnológico de Costa , ingeniería en Computadores
     Proyecto 1: From mars to saturn, Año 2021, Grupo 02
     Profesor Milton Villegas Lemus
     Versión del programa 1.0
@@ -9,19 +9,21 @@ about="""
     Autores de algunos módulos utilizados: José Fernando Morales    
     """
 
-from ctypes import create_unicode_buffer
 import time
 from tkinter import *
 from typing import get_origin
 import vlc 
 from os import path
-from threading import Thread, ThreadError
+from threading import Thread
 import glob 
 import random 
 from time import sleep
 
 #FLAG para cerrar hilos y parar procesos
 ACTIVE=TRUE
+
+Score=0
+ship_life=50
 
 #Ventana principal
 Space_p = Tk()
@@ -30,6 +32,11 @@ Space_p.minsize(800,800)
 Space_p.resizable(width=NO, height=NO)
 ##Reproductor de sonido###VLC################
 sound_player = vlc.MediaPlayer()
+#########Canvas pantalla Principal###################
+P_space= Canvas(Space_p,bg='White',width=800,height=800)
+P_space.place(x=0,y=0)
+
+
 def sound_load(name): #Ruta del .MP3
     return path.join('assets\\music',name)
 def player_music(MP3): # Reproductor de Musica
@@ -61,6 +68,9 @@ def load_Simage(input,list_result):
     else:
         list_result.append(PhotoImage(file=input[0]))
     return load_Simage(input[1:],list_result) 
+
+P_space.fonde= img_load('fonde.png')
+fonde = P_space.create_image(0,0, anchor=NW, image=P_space.fonde)
   
 #Ventana de seleccion de niveles
  
@@ -114,9 +124,22 @@ def highscore():
         
     B_close=Button(score,bg='Red',text='Back',command=close_score)
     B_close.place(x=0,y=0)
+    
+E_Nombre = Entry(Space_p,font=("Comic Sans MS",10))
+E_Nombre.place(x=115,y=400)
 
+def Validar1():#Se verifica que la entrada tenga algun texto
+    global E_Nombre
+    nombre_usuario = E_Nombre.get()
+    if (nombre_usuario!=""):
+        return level1()
+
+
+        
 def level1():
-    global ACTIVE    
+    global ACTIVE, Score, ship_life
+    ship_life
+    Score=0    
     ACTIVE=True 
     Space_p.withdraw()
     
@@ -125,10 +148,25 @@ def level1():
     levelone.minsize(800,800)
     levelone.resizable(width=NO,height=NO)
 
-    C_level1 = Canvas(levelone,bg='White',width=800,height=800)
+    C_level1 = Canvas(levelone,bg='White',width=1700,height=1700)
     C_level1.place(x=0,y=0)
+    C_level1.fondo = img_load('Fondo1.png')
+    Fondo1 = C_level1.create_image(0,0,anchor=NW, image=C_level1.fondo)
 
-    
+    def Reloj(seg,minu):#Se crea un reloj con recursividad para determinar el tiempo de la partida
+        if ACTIVE:
+            sleep(1)#Cada segundo, le suma 1 a la variable seg
+            seg+=1
+            if seg==60:#Si la variable seg es 60, la variable minu le suma 1
+                minu+=1
+                seg=0
+            Reloj_L.config(text="Tiempo:"+str(minu)+":"+str(seg))
+            return Reloj(seg,minu)
+
+    Thread(target=Reloj,args=[0,0]).start()
+
+    Reloj_L= Label(levelone, text="Tiempo:0:0",bg="#161d2f", fg="white")
+    Reloj_L.place(x=730, y=60)
 
     images= load_sprite('tile*.png')
     ship = C_level1.create_image(350,700, tags='ship')
@@ -164,120 +202,60 @@ def level1():
     #C_level1.bind_all('<KeyRelease-space>',fire)
 
 
-
-
-    C_level1.rock0 = img_load('rock.png')
-    C_level1.rock1 = img_load('rock.png')
-    
-
+    Roca = img_load('rock.png')
     
     
-  
-    """
-    def move_rockx(Rock):
-        Cor_rock= C_level1.coords(Rock)
-        if(ACTIVE):
-            if Cor_rock[0]>=700:
-                C_level1.move(Rock,-5,0)
-                C_level1.after(15,move_rockx,-5)
-            elif Cor_rock[0]<2:
-                C_level1.move(Rock,5,0)
-                C_level1.after(15,move_rockx,5)   
-            else:
-                C_level1.move(Rock,Rock,0)
-                C_level1.after(15,move_rockx,Rock)
-    Thread(target=move_rockx,args=(5,)).start()
     
-    def move_rocky(Rock):
-         Cor_rock= C_level1.coords(rock00)
-         if(ACTIVE):
-            if Cor_rock[1]>780:
-                C_level1.move(rock00,0,-5)  
-                C_level1.after(15,move_rocky,-5)
-            elif Cor_rock[1]<0:
-                C_level1.move(rock00,0,5)
-                C_level1.after(15,move_rocky,5)
-            else:
-                C_level1.move(rock00,0,Rock)
-                C_level1.after(15,move_rocky,Rock)
-    Thread(target=move_rocky,args=(5,)).start()
-    """
-    def selector():
-        if(ACTIVE):
-            sleep(0.5)
-            rocks_s()
-            sleep(0,7)
-            selector()
-    Thread(target=selector).start()
-
-
-    def move_rock(rock):
-        coords_rock= C_level1.coords(rock)
-        if(ACTIVE):
-            if coords_rock[0]>830 or coords_rock[0]<-15 or coords_rock[1]>830 or coords_rock[1]<-15:
-                C_level1.delete(rock)
-        
-        else:
-            C_level1.move(rock,5,5)
-            C_level1.after(10,move_rock,rock)
-    
-    def rocks_s():
-        if(ACTIVE):
-            coords = C_level1.coords(0,0)
-            rock1 = C_level1.create_image(x=0,y=800, anchor=NW, image=C_level1.rock0) 
-            rock2 = C_level1.create_image(x=0,y=0,anchor=NW,image=C_level1.rock1)
-            Thread(target=move_rock,args=(rock1,)).start()
-            Thread(target=move_rock,args=(rock2,)).start()
-            
-    
-    
-    """
-    Bullet = cargar_img2('Bullet2.png')
 
     Flag2=True
-    def temporizador2():
+    def temporizador1():
         nonlocal Flag2
         if Flag2 == True:
-            time.sleep(1)
-            DisparoJefe()
-            temporizador2()
-    Thread(target = temporizador2).start() 
+            time.sleep(5)
+            Salida_Roca()
+            temporizador1()
+    Thread(target = temporizador1).start()
 
-    def MovimientoD(Bala):
-        global Boss_life, reproducir_fx, Score, Nave_life, FlagA
-        Bala_box= Canv_Pantalla2.bbox(Bala)
-        Aliadobox= Canv_Pantalla2.bbox(Aliado_Canv)
-        if FlagA==True:
-            if Canv_Pantalla2.coords(Bala)[1]>700: #Limite hasta donde llega la bala
-                Canv_Pantalla2.delete(Bala)
-            elif Aliadobox[0]<Bala_box[2] and Aliadobox[2]>Bala_box[0] and Aliadobox[1]<Bala_box[3]<Aliadobox[3] and Aliadobox[3] > Aliadobox[1]:
-                Canv_Pantalla2.delete(Bala)
-                if Nave_life!=0:
-                    Nave_life-=3
-                    Nave_life_l2.config(text="❤:" + str(Nave_life))
-                if Nave_life==2:
-                    Nave_life-=2
-                    Nave_life_l2.config(text="❤:" + str(Nave_life))
+    def mov_roca(Rock):
+        if ACTIVE==True:
+            Aleatorio0= random.randint(1,30)
+            Aleatorio= random.randint(1,40)
+            if C_level1.coords(Rock)[0]>800:
+                C_level1.move(Rock,-Aleatorio,-Aleatorio0)
+            if C_level1.coords(Rock)[1]>800:
+                C_level1.move(Rock,-Aleatorio,-Aleatorio0)
             else:
-                Canv_Pantalla2.move(Bala,0,3) #El disparo avanza en el eje Y
-                Canv_Pantalla2.after(15,MovimientoD,Bala)
+                C_level1.move(Rock,Aleatorio,Aleatorio0)
+                C_level1.after(200,mov_roca,Rock)
 
-    def DisparoJefe():
-        global FlagA
-        if FlagA==True:
-            coords= Canv_Pantalla2.coords(Jefe2_E)
-            Bala1 = Canv_Pantalla2.create_image(coords[0]+80,coords[1]-55,anchor=NW,image=Bullet)
-            Bala2 = Canv_Pantalla2.create_image(coords[0]-100,coords[1]-55,anchor=NW,image=Bullet)
-            Bala3 = Canv_Pantalla2.create_image(coords[0]-35,coords[1]+50,anchor=NW,image=Bullet)
-            reproducir_fx(cargarMP3('SE_01.wav'))
-            Thread(target=MovimientoD, args=(Bala1,)).start()
-            Thread(target=MovimientoD, args=(Bala2,)).start()
-            Thread(target=MovimientoD, args=(Bala3,)).start()
-        
-       
 
-        """
+    def Salida_Roca():
+        Aleatorio1= random.randint(400,700)
+        Aleatorio2= random.randint(700,1100)
+        if ACTIVE==True:
+            print(Aleatorio2)
+            print(Aleatorio1)
+            coords= C_level1.coords(ship)
+            Roca1 = C_level1.create_image(coords[0]+Aleatorio2,coords[1]+Aleatorio1,anchor=NW,image=Roca)
+            Roca2 = C_level1.create_image(coords[0]-Aleatorio2,coords[1]-Aleatorio2,anchor=NW,image=Roca)
+            Roca3 = C_level1.create_image(coords[0]+Aleatorio1,coords[1]-Aleatorio1,anchor=NW,image=Roca)
+            Thread(target=mov_roca, args=(Roca1,)).start()
+            Thread(target=mov_roca, args=(Roca2,)).start()
+            Thread(target=mov_roca, args=(Roca3,)).start()
 
+
+
+
+
+
+
+
+
+
+    Nave_life_l1 = Label(levelone, text="❤:" + str(ship_life),bg="#161d2f", fg="white")
+    Nave_life_l1.place(x=25, y=700)
+    Score_L = Label(levelone, text="Puntos:" + str(Score),bg="#161d2f", fg="white")
+    Score_L.place(x=740, y=10)
 
     #####CERRAR VENTANA##############
     def closelevel1():
@@ -295,16 +273,6 @@ def level1():
 
 
 
-
-
-
-
-
-
-
-
-
-
 #Funcion para cerrar el programa
 def close():
     global Space_p
@@ -317,11 +285,9 @@ def close():
 
 
 
-#########Canvas pantalla Principal###################
-P_space= Canvas(Space_p,bg='White',width=800,height=800)
-P_space.place(x=0,y=0)
-P_space.fonde= img_load('fonde.png')
-fonde = P_space.create_image(0,0, anchor=NW, image=P_space.fonde)
+
+
+
 #Botones
 #Botones pantalla principal
 ship= img_load('ship_player\\tile001.png')
@@ -338,12 +304,12 @@ B_closegame.place(x=770,y=0)
 
 #Botones pantalla principal niveles 
 
-B_level1= Button(Space_p,bg='#41036e',text='Level 1',font='Terminal',command=level1) 
+B_level1= Button(Space_p,bg='#41036e',text='Level 1',font='Terminal',command=Validar1) 
 B_level1.place(x=350,y=400)
-#B_level2= Button(Space_p,bg='#41036e',text='Level 2',font='Terminal',command=#level2)
-#B_level2.place(x=350,y=450)
-#B_level3= Button(Space_p,bg='#41036e',text='Level 3',font='Terminal',command=#level3)
-#B_level3.place(x=350,y=500)
+B_level2= Button(Space_p,bg='#41036e',text='Level 2',font='Terminal',command="level2")
+B_level2.place(x=350,y=450)
+B_level3= Button(Space_p,bg='#41036e',text='Level 3',font='Terminal',command="level3")
+B_level3.place(x=350,y=500)
 
 
 Space_p.protocol('WM_DELETE_WINDOW',close)
