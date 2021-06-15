@@ -188,7 +188,7 @@ def level1():
         nonlocal images
         if(i==3):
             i=0
-        if(ACTIVE==True):
+        if(ACTIVE):
             C_level1.itemconfig('ship',image=images[i])
             time.sleep(0.1)
             Thread(target=recursive_animation,args=(i+1,)).start()
