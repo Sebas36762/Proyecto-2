@@ -23,7 +23,7 @@ from time import sleep
 ACTIVE=TRUE
 
 Score=0
-ship_life=50
+ship_life=3
 
 #Ventana principal
 Space_p = Tk()
@@ -138,7 +138,7 @@ def Validar1():#Se verifica que la entrada tenga algun texto
         
 def level1():
     global ACTIVE, Score, ship_life
-    ship_life
+    ship_life=3
     Score=0    
     ACTIVE=True 
     Space_p.withdraw()
@@ -154,14 +154,19 @@ def level1():
     Fondo1 = C_level1.create_image(0,0,anchor=NW, image=C_level1.fondo)
 
     def Reloj(seg,minu):#Se crea un reloj con recursividad para determinar el tiempo de la partida
+        global Score
         if (ACTIVE):
             sleep(1)#Cada segundo, le suma 1 a la variable seg
+            Score+=1
+            Score_L.config(text="Puntos:" + str(Score))
             seg+=1
-            if seg==59:#Si la variable seg es 60, la variable minu le suma 1
+            if seg==60:#Si la variable seg es 60, la variable minu le suma 1
                 minu+=1
                 seg=0
+                #if minu==1:
+                   #return #Pantalla_de_Selección()
             Reloj_L.config(text="Tiempo:"+str(minu)+":"+str(seg))
-            Reloj(seg,minu)
+            return Reloj(seg,minu)
     Thread(target=Reloj,args=(0,0)).start()
 
     Reloj_L= Label(levelone, text="Tiempo:0:0",bg="#161d2f", fg="white")
@@ -199,48 +204,71 @@ def level1():
     C_level1.bind_all('<KeyPress-Left>',move_ship)
     C_level1.bind_all('<KeyPress-Right>',move_ship)
     
-    C_level1.rock= img_load('rock.png')
-    rock00 = C_level1.create_image(random.randint(100,500),random.randint(-10,0),anchor=NW,image=C_level1.rock)
-    rock01= C_level1.create_image(random.randint(-10,0),random.randint(800,850), anchor=NW,image=C_level1.rock)
-    rock02 = C_level1.create_image(random.randint(800,850),random.randint(0,800), anchor=NW,image=C_level1.rock)
+    rock= img_load('rock.png')
+    Roca0 = C_level1.create_image(random.randint(10,500),random.randint(-10,200),anchor=NW,image=rock)
+    Roca1 = C_level1.create_image(random.randint(10,500),random.randint(-10,200),anchor=NW,image=rock)
+    Roca2 = C_level1.create_image(random.randint(10,500),random.randint(-10,200),anchor=NW,image=rock)
     
+
+    
+    Flag2=True
+    def temporizador1():
+        nonlocal Flag2
+        if Flag2 == True:
+            time.sleep(30)
+            Salida_Rocas()
+            temporizador1()
+    Thread(target = temporizador1).start()
 
     def move_rockx(rock,x):
         Cor_rock= C_level1.coords(rock)
         if(ACTIVE):
-            if Cor_rock[0]>=700:
+            if Cor_rock[0]>=900:
                 C_level1.move(rock,-10,0)
-                C_level1.after(30,move_rockx,rock,-10)
-            elif Cor_rock[0]<2:
+                C_level1.after(50,move_rockx,rock,-10)
+            elif Cor_rock[0]<-150:
                 C_level1.move(rock,10,0)
-                C_level1.after(30,move_rockx,rock,10)   
+                C_level1.after(50,move_rockx,rock,10)   
             else:
                 C_level1.move(rock,x,0)
-                C_level1.after(30,move_rockx,rock,x)
+                C_level1.after(50,move_rockx,rock,x)
     
     
-    def move_rocky(rock,x):
+    def move_rocky(rock,y):
          Cor_rock= C_level1.coords(rock)
          if(ACTIVE):
-            if Cor_rock[1]>780:
+            if Cor_rock[1]>900:
                 C_level1.move(rock,0,-10)  
-                C_level1.after(30,move_rocky,rock,-10)
-            elif Cor_rock[1]<0:
+                C_level1.after(50,move_rocky,rock,-10)
+            elif Cor_rock[1]<-150:
                 C_level1.move(rock,0,10)
-                C_level1.after(30,move_rocky,rock,10)
+                C_level1.after(50,move_rocky,rock,10)
             else:
-                C_level1.move(rock,0,x)
-                C_level1.after(30,move_rocky,rock,x)
+                C_level1.move(rock,0,y)
+                C_level1.after(50,move_rocky,rock,y)
     
-    
-    Thread(target=move_rockx,args=(rock00,10,)).start()
-    Thread(target=move_rocky,args=(rock00,10,)).start()
+    def Salida_Rocas():
+        Aleatorio1= random.randint(400,700)
+        Aleatorio2= random.randint(700,1100)
+        if ACTIVE==True:
+            coords= C_level1.coords(ship)
+            Roca1 = C_level1.create_image(coords[0]+Aleatorio2,coords[1]-Aleatorio1,anchor=NW,image=rock)
+            Roca2 = C_level1.create_image(coords[0]-Aleatorio2,coords[1]-Aleatorio2,anchor=NW,image=rock)
+            Roca3 = C_level1.create_image(coords[0]-Aleatorio1,coords[1]+Aleatorio1,anchor=NW,image=rock)
+            Thread(target=move_rockx,args=(Roca1,10,)).start()
+            Thread(target=move_rocky,args=(Roca1,10,)).start()
+            Thread(target=move_rockx,args=(Roca2,10,)).start()
+            Thread(target=move_rocky,args=(Roca2,10,)).start()
+            Thread(target=move_rockx,args=(Roca3,10,)).start()
+            Thread(target=move_rocky,args=(Roca3,10,)).start()
 
-    Thread(target=move_rockx,args=(rock01,10,)).start()
-    Thread(target=move_rocky,args=(rock01,10,)).start()
+    Thread(target=move_rockx,args=(Roca0,10,)).start()
+    Thread(target=move_rocky,args=(Roca0,10,)).start()
+    Thread(target=move_rockx,args=(Roca1,10,)).start()
+    Thread(target=move_rocky,args=(Roca1,10,)).start()
+    Thread(target=move_rockx,args=(Roca2,10,)).start()
+    Thread(target=move_rocky,args=(Roca2,10,)).start()
 
-    Thread(target=move_rockx,args=(rock02,10,)).start()
-    Thread(target=move_rocky,args=(rock02,10,)).start()
 
 
    
