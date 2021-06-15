@@ -127,7 +127,7 @@ def highscore():
     
 E_Nombre = Entry(Space_p,font=("Comic Sans MS",10))
 E_Nombre.place(x=115,y=400)
-
+print(E_Nombre)
 def Validar1():#Se verifica que la entrada tenga algun texto
     global E_Nombre
     nombre_usuario = E_Nombre.get()
@@ -152,25 +152,34 @@ def level1():
     C_level1.place(x=0,y=0)
     C_level1.fondo = img_load('Fondo1.png')
     Fondo1 = C_level1.create_image(0,0,anchor=NW, image=C_level1.fondo)
+    
+    Name_L = Label(levelone,text='Player:'+ str(E_Nombre),bg="#161d2f",fg="white")
+    Name_L.place(x=300,y=60)
+    Reloj_L= Label(levelone, text="Tiempo:0:0",bg="#161d2f", fg="white")
+    Reloj_L.place(x=730, y=60)
 
     def Reloj(seg,minu):#Se crea un reloj con recursividad para determinar el tiempo de la partida
-        global Score
+        
+        global Score, ACTIVE
         if (ACTIVE):
             sleep(1)#Cada segundo, le suma 1 a la variable seg
             Score+=1
-            Score_L.config(text="Puntos:" + str(Score))
             seg+=1
             if seg==60:#Si la variable seg es 60, la variable minu le suma 1
                 minu+=1
                 seg=0
-                #if minu==1:
-                   #return #Pantalla_de_Selección()
+                if minu==1:
+                    Reloj_L.config(text="Exit")
+                    final= Label(levelone, text="You win the level",font='Terminal',bg="#161d2f", fg="white")
+                    final.place(x=400, y=400)
+                    ACTIVE=False 
             Reloj_L.config(text="Tiempo:"+str(minu)+":"+str(seg))
-            return Reloj(seg,minu)
+            Score_L.config(text="Puntos:" + str(Score))
+            Reloj(seg,minu)
+        
     Thread(target=Reloj,args=(0,0)).start()
 
-    Reloj_L= Label(levelone, text="Tiempo:0:0",bg="#161d2f", fg="white")
-    Reloj_L.place(x=730, y=60)
+    
 
     images= load_sprite('tile*.png')
     ship = C_level1.create_image(350,700, tags='ship')
@@ -186,18 +195,19 @@ def level1():
     Thread(target=recursive_animation,args=(0,)).start()    
 
     def move_ship(event):
-        if event.keysym =='Up':
-            if C_level1.coords(ship)[1]>0:
-                C_level1.move(ship,0,-13)
-        elif event.keysym =='Down':
-            if C_level1.coords(ship)[1]<780:
-                C_level1.move(ship,0,13)
-        elif event.keysym =='Left':
-            if C_level1.coords(ship)[0]>30:
-                C_level1.move(ship,-13,0)
-        elif event.keysym =='Right':
-            if C_level1.coords(ship)[0]<780:
-                C_level1.move(ship,13,0)
+        if(ACTIVE):
+            if event.keysym =='Up':
+                if C_level1.coords(ship)[1]>0:
+                    C_level1.move(ship,0,-13)
+            elif event.keysym =='Down':
+                if C_level1.coords(ship)[1]<780:
+                    C_level1.move(ship,0,13)
+            elif event.keysym =='Left':
+                if C_level1.coords(ship)[0]>30:
+                    C_level1.move(ship,-13,0)
+            elif event.keysym =='Right':
+                if C_level1.coords(ship)[0]<780:
+                    C_level1.move(ship,13,0)
 
     C_level1.bind_all('<KeyPress-Up>',move_ship)
     C_level1.bind_all('<KeyPress-Down>',move_ship)
@@ -205,19 +215,20 @@ def level1():
     C_level1.bind_all('<KeyPress-Right>',move_ship)
     
     rock= img_load('rock.png')
-    Roca0 = C_level1.create_image(random.randint(10,500),random.randint(-10,200),anchor=NW,image=rock)
-    Roca1 = C_level1.create_image(random.randint(10,500),random.randint(-10,200),anchor=NW,image=rock)
-    Roca2 = C_level1.create_image(random.randint(10,500),random.randint(-10,200),anchor=NW,image=rock)
+    Roca0 = C_level1.create_image(random.randint(0,400),random.randint(-10,0),anchor=NW,image=rock)
+    Roca1 = C_level1.create_image(random.randint(400,800),random.randint(800,850),anchor=NW,image=rock)
+    Roca2 = C_level1.create_image(random.randint(10,500),random.randint(800,850),anchor=NW,image=rock)
     
 
     
     Flag2=True
     def temporizador1():
-        nonlocal Flag2
-        if Flag2 == True:
-            time.sleep(30)
-            Salida_Rocas()
-            temporizador1()
+        if(ACTIVE):
+            nonlocal Flag2
+            if Flag2 == True:
+                time.sleep(30)
+                Salida_Rocas()
+                temporizador1()
     Thread(target = temporizador1).start()
 
     def move_rockx(rock,x):
@@ -250,7 +261,7 @@ def level1():
     def Salida_Rocas():
         Aleatorio1= random.randint(400,700)
         Aleatorio2= random.randint(700,1100)
-        if ACTIVE==True:
+        if (ACTIVE):
             coords= C_level1.coords(ship)
             Roca1 = C_level1.create_image(coords[0]+Aleatorio2,coords[1]-Aleatorio1,anchor=NW,image=rock)
             Roca2 = C_level1.create_image(coords[0]-Aleatorio2,coords[1]-Aleatorio2,anchor=NW,image=rock)
