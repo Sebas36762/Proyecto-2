@@ -4,7 +4,7 @@ about="""
     Tecnológico de Costa , ingeniería en Computadores
     Proyecto 1: From mars to saturn, Año 2021, Grupo 02
     Profesor Milton Villegas Lemus
-    Versión del programa 1.0
+    Versión del programa 1.0    
     Autores: Angelo Fabian Ceciliano Ortega, Sebastian Chaves Ruiz
     Autores de algunos módulos utilizados: José Fernando Morales    
     """
@@ -137,11 +137,12 @@ def Validar1():#Se verifica que la entrada tenga algun texto
 
         
 def level1():
-    global ACTIVE, Score, ship_life
+    global ACTIVE, Score, ship_life, E_Nombre
     ship_life=3
     Score=0    
     ACTIVE=True 
     Space_p.withdraw()
+    nombre_usuario = E_Nombre.get()
     
     levelone = Toplevel()
     levelone.title('1 level')
@@ -153,10 +154,9 @@ def level1():
     C_level1.fondo = img_load('Fondo1.png')
     Fondo1 = C_level1.create_image(0,0,anchor=NW, image=C_level1.fondo)
     
-    Name_L = Label(levelone,text='Player:'+ str(E_Nombre),bg="#161d2f",fg="white")
-    Name_L.place(x=300,y=60)
-    Reloj_L= Label(levelone, text="Tiempo:0:0",bg="#161d2f", fg="white")
-    Reloj_L.place(x=730, y=60)
+    Name_L = Label(levelone,text='Player:'+ str(nombre_usuario),bg="#161d2f",fg="white")
+    Name_L.place(x=25,y=750)
+
 
     def Reloj(seg,minu):#Se crea un reloj con recursividad para determinar el tiempo de la partida
         
@@ -197,16 +197,16 @@ def level1():
     def move_ship(event):
         if(ACTIVE):
             if event.keysym =='Up':
-                if C_level1.coords(ship)[1]>0:
+                if C_level1.coords(ship)[1]>65:
                     C_level1.move(ship,0,-13)
             elif event.keysym =='Down':
-                if C_level1.coords(ship)[1]<780:
+                if C_level1.coords(ship)[1]<754:
                     C_level1.move(ship,0,13)
             elif event.keysym =='Left':
-                if C_level1.coords(ship)[0]>30:
+                if C_level1.coords(ship)[0]>43:
                     C_level1.move(ship,-13,0)
             elif event.keysym =='Right':
-                if C_level1.coords(ship)[0]<780:
+                if C_level1.coords(ship)[0]<741:
                     C_level1.move(ship,13,0)
 
     C_level1.bind_all('<KeyPress-Up>',move_ship)
@@ -296,6 +296,8 @@ def level1():
     Nave_life_l1.place(x=25, y=700)
     Score_L = Label(levelone, text="Puntos:" + str(Score),bg="#161d2f", fg="white")
     Score_L.place(x=740, y=10)
+    Reloj_L= Label(levelone, text="Tiempo:0:0",bg="#161d2f", fg="white")
+    Reloj_L.place(x=650, y=10)
 
     #####CERRAR VENTANA##############
     def closelevel1():
@@ -305,7 +307,7 @@ def level1():
         Space_p.deiconify()
         levelone.destroy()
     #####Botones########
-    B_closelevels = Button(levelone,bg='Red',text='Back and Close',font='Terminal',command=closelevel1)
+    B_closelevels = Button(levelone,bg='Red',text='Cerrar y Volver',font='Terminal',command=closelevel1)
     B_closelevels.place(x=0,y=0)
     levelone.protocol('WM_DELETE_WINDOW',closelevel1)
 
@@ -344,11 +346,11 @@ B_closegame.place(x=770,y=0)
 
 #Botones pantalla principal niveles 
 
-B_level1= Button(Space_p,bg='#41036e',text='Level 1',font='Terminal',command=Validar1) 
+B_level1= Button(Space_p,bg='#41036e',text='Fácil',font='Terminal',command=Validar1) 
 B_level1.place(x=350,y=400)
-B_level2= Button(Space_p,bg='#41036e',text='Level 2',font='Terminal',command="level2")
+B_level2= Button(Space_p,bg='#41036e',text='Intermedio',font='Terminal',command="level2")
 B_level2.place(x=350,y=450)
-B_level3= Button(Space_p,bg='#41036e',text='Level 3',font='Terminal',command="level3")
+B_level3= Button(Space_p,bg='#41036e',text='Difícil',font='Terminal',command="level3")
 B_level3.place(x=350,y=500)
 
 
