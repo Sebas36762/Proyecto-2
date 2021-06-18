@@ -392,8 +392,10 @@ def level1():
 
     #####CERRAR VENTANA##############
     def closelevel1():
-        global ACTIVE
-        ACTIVE=False 
+        global ACTIVE, Score, ship_life
+        ACTIVE=False
+        Score=0
+        ship_life=3 
         stop_sound()
         Space_p.deiconify()
         levelone.destroy()
@@ -429,7 +431,10 @@ def level2():
         pass
     else:
         Score=0
-    ship_life=3
+    if ship_life!=0:
+            pass
+    else:
+        ship_life=3   
     ACTIVE=True 
     Space_p.withdraw()
     nombre_usuario = E_Nombre.get()
@@ -638,7 +643,9 @@ def level2():
 
     #####CERRAR VENTANA##############
     def closelevel1():
-        global ACTIVE
+        global ACTIVE, Score, ship_life
+        ship_life=3
+        Score=0
         ACTIVE=False 
         stop_sound()
         Space_p.deiconify()
@@ -671,7 +678,10 @@ def level3():
         pass
     else:
         Score=0
-    ship_life=3   
+    if ship_life!=0:
+        pass
+    else:
+        ship_life=3   
     ACTIVE=True 
     Space_p.withdraw()
     nombre_usuario = E_Nombre.get()
@@ -874,7 +884,9 @@ def level3():
 
     #####CERRAR VENTANA##############
     def closelevel1():
-        global ACTIVE
+        global ACTIVE, Score, ship_life
+        ship_life=3
+        Score=0
         ACTIVE=False 
         stop_sound()
         Space_p.deiconify()
